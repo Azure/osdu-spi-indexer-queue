@@ -1,0 +1,84 @@
+# Per-service upstream filter config (ADR-038), hand-planted on the fork's main
+# before initialization because the layout deviates from the conventional shape:
+# there is no provider/ directory, the two Azure modules sit at the top level in the
+# root pom's default modules, so fork_owned lists the trees (engine 1.1.0) and the
+# azure profile re-adds both modules.
+# Every upstream top-level entry, testing/ entry, root pom profile, and
+# .fossa.yml module must appear here: the engine halts rather than guess.
+service: indexer-queue
+
+fork_owned:
+  - indexer-queue-azure-enqueue
+  - indexer-queue-azure-requeue
+  - testing/indexer-queue-azure-enqueue
+
+top_level:
+  .config: keep
+  .dockerignore: keep
+  .editorconfig: keep
+  .env.template: keep
+  .envrc.template: keep
+  .fossa.yml: keep
+  .gitattributes: keep
+  .gitignore: keep
+  .gitlab: strip
+  .gitlab-ci.yml: strip
+  .mvn: keep
+  .sonarlint: keep
+  .trufflehog-exclude: strip
+  docs: keep
+  indexer-queue-azure-enqueue: strip
+  indexer-queue-azure-requeue: strip
+  indexer-queue-ibm: strip
+  LICENSE: keep
+  NOTICE: keep
+  pom.xml: keep
+  publish.yml: strip
+  README.md: strip
+  resources: keep
+  skaffold.yaml: strip
+
+testing:
+  INTEGRATION-TESTS.md: keep
+  README.md: keep
+  pom.xml: keep
+  indexer-queue-azure-enqueue: fork
+
+profiles:
+  Default: keep
+  azure: inject
+  aws: strip
+  gc: strip
+  gcp: strip
+  ibm: strip
+
+fossa_modules:
+  indexer-queue: keep
+  indexer-queue-ibm: strip
+  EnqueueFunction: strip
+  RequeueFunction: strip
+
+expected_kept:
+  - pom.xml
+  - testing/pom.xml
+
+expected_absent:
+  - provider
+  - devops
+  - indexer-queue-ibm
+  - indexer-queue-azure-enqueue
+  - indexer-queue-azure-requeue
+  - .gitlab-ci.yml
+  - testing/indexer-queue-azure-enqueue
+
+inject_root_pom_azure_profile: |
+        <profile>
+            <id>azure</id>
+            <modules>
+                <module>indexer-queue-azure-enqueue</module>
+                <module>indexer-queue-azure-requeue</module>
+            </modules>
+        </profile>
+
+inject_testing_pom_azure_module: |
+        <module>indexer-queue-azure-enqueue</module>

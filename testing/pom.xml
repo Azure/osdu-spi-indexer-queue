@@ -32,7 +32,7 @@
     </description>
 
     <modules>
-        <module>indexer-queue-azure-enqueue</module>
+      <module>indexer-queue-azure-enqueue</module>
     </modules>
 
     <distributionManagement>

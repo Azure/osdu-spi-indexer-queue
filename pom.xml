@@ -8,9 +8,6 @@
     <version>0.31.0-SNAPSHOT</version>
 
     <modules>
-        <module>indexer-queue-ibm</module>
-        <module>indexer-queue-azure-enqueue</module>
-        <module>indexer-queue-azure-requeue</module>
 	</modules>
     <packaging>pom</packaging>
 
@@ -388,6 +385,13 @@
                 <publish.releases.url>https://community.opengroup.org/api/v4/projects/73/packages/maven</publish.releases.url>
             </properties>
         </profile>
+      <profile>
+          <id>azure</id>
+          <modules>
+              <module>indexer-queue-azure-enqueue</module>
+              <module>indexer-queue-azure-requeue</module>
+          </modules>
+      </profile>
     </profiles>
 
 </project>

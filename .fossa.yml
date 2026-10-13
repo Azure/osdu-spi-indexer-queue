@@ -12,15 +12,3 @@ analyze:
       type: mvn
       target: pom.xml
       path: .
-    - name: indexer-queue-ibm
-      type: mvn
-      target: indexer-queue-ibm/pom.xml
-      path: .
-    - name: EnqueueFunction
-      type: mvn
-      target: indexer-queue-azure-enqueue/pom.xml
-      path: .
-    - name: RequeueFunction
-      type: mvn
-      target: indexer-queue-azure-requeue/pom.xml
-      path: .

@@ -6,8 +6,9 @@ updates:
 
   - package-ecosystem: "maven"
     directories:
-      - "/provider/*-azure"
-      - "/testing/*-test-azure"
+      - "/indexer-queue-azure-enqueue"
+      - "/indexer-queue-azure-requeue"
+      - "/testing/indexer-queue-azure-enqueue"
     schedule:
       interval: "weekly"
       day: "monday"

@@ -207,7 +207,7 @@
     <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-guice</artifactId>
-        <version>4.7.9.Final</version>
+        <version>4.7.10.Final</version>
         <exclusions>
             <exclusion>
                 <groupId>commons-io</groupId>

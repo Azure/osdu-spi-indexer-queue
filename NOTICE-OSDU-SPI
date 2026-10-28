@@ -1,0 +1,17 @@
+NOTICES
+
+This repository incorporates material as listed below or described in the code.
+
+Component: OSDU indexer-queue
+Source: https://community.opengroup.org/osdu/platform/system/indexer-queue
+License: Apache License, Version 2.0 (see LICENSE)
+
+This repository is a fork of the OSDU community project indexer-queue and carries
+its history. Individual source files keep their original copyright notices.
+It includes code contributed to that project by OSDU community contributors,
+among them these copyright holders named in its source file headers:
+
+  Microsoft Corporation
+  SLB
+
+Notices for third-party dependencies are in NOTICE.

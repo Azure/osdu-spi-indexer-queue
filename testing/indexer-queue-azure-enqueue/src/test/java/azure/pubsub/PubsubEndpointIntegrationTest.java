@@ -50,6 +50,10 @@ public class PubsubEndpointIntegrationTest {
     protected static final String SCHEMA_URL = System.getProperty("SCHEMA_URL", System.getenv("SCHEMA_URL"));
     protected static final String INDEXER_URL = System.getProperty("INDEXER_URL", System.getenv("INDEXER_URL"));
 
+    protected static final long INDEXING_TIMEOUT_MILLIS = 120_000;
+    protected static final long POLL_INTERVAL_MILLIS = 5_000;
+    protected static final long SCHEMA_EVENT_SETTLE_MILLIS = 15_000;
+
     protected static ObjectMapper mapper = new ObjectMapper();
     protected static Gson gson = new Gson();
     
@@ -87,53 +91,68 @@ public class PubsubEndpointIntegrationTest {
         assertEquals(201, storageServiceResponse.getStatus());
         assertTrue(storageServiceResponse.getType().toString().contains("application/json"));
 
-        // Sleep for one minute to wait for indexing to happen
-        Thread.sleep(60000);
-        ClientResponse response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBody(), "");
-        String json = response.getEntity(String.class);
-        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
-        assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
+        assertEquals(1, searchUntilFound(getSearchQueryRequestBody()));
     }
 
     @Test
     public void should_beAbleToSearchRecord_whenSchemaChanges() throws Exception {
-        //create a new kind via Schema service
-        String schemaPayload = getInitialSchemaPayload();
-        TestUtils.send(SCHEMA_URL, "schema", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), schemaPayload, "");
+        try {
+            //create a new kind via Schema service
+            String schemaPayload = getInitialSchemaPayload();
+            TestUtils.send(SCHEMA_URL, "schema", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), schemaPayload, "");
 
-        //create a new record via Storage service using created kind
-        String jsonInput = createJsonBodyWithKind(SCHEMA_UPDATE_KIND, "john", "");
-        ClientResponse storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
-        assertEquals(201, storageServiceResponse.getStatus());
+            //create a new record via Storage service using created kind
+            String jsonInput = createJsonBodyWithKind(SCHEMA_UPDATE_KIND, "john", "");
+            ClientResponse storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
+            assertEquals(201, storageServiceResponse.getStatus());
 
-        //record should be searchable via Search service
-        Thread.sleep(60000);
-        ClientResponse response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBodyQueryWithFirstName(SCHEMA_UPDATE_KIND, "john"), "");
-        String json = response.getEntity(String.class);
-        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
-        assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
+            //record should be searchable via Search service
+            assertEquals(1, searchUntilFound(getSearchQueryRequestBodyQueryWithFirstName(SCHEMA_UPDATE_KIND, "john")));
 
-        //modify kind via schema service
-        String modifySchemaPayalod = getUpdatedSchemaPayload();
-        TestUtils.send(SCHEMA_URL, "schema", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), modifySchemaPayalod, "");
+            //modify kind via schema service
+            String modifySchemaPayalod = getUpdatedSchemaPayload();
+            TestUtils.send(SCHEMA_URL, "schema", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), modifySchemaPayalod, "");
 
-        //create a new record via Storage service using modified kind
-        jsonInput = createJsonBodyWithKind(SCHEMA_UPDATE_KIND, "john", "doe");
-        storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
-        assertEquals(201, storageServiceResponse.getStatus());
+            // The schema-changed event travels schema -> Service Bus -> indexer-queue -> indexer, and the
+            // index mapping is not dynamic: a record indexed before the mapping gains lastname is never
+            // searchable by it. Give the event time to land before writing the record.
+            Thread.sleep(SCHEMA_EVENT_SETTLE_MILLIS);
 
-        //new record should be searchable with modified query
-        Thread.sleep(60000);
-        response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), getSearchQueryRequestBodyQueryWithLastName(SCHEMA_UPDATE_KIND, "doe"), "");
-        json = response.getEntity(String.class);
-        jsonObject = new JsonParser().parse(json).getAsJsonObject();
-        assertEquals(1,Integer.parseInt(jsonObject.get("totalCount").toString()));
+            //create a new record via Storage service using modified kind
+            jsonInput = createJsonBodyWithKind(SCHEMA_UPDATE_KIND, "john", "doe");
+            storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
+            assertEquals(201, storageServiceResponse.getStatus());
 
-        //clean up index
-        String kindParam = "?kind="+SCHEMA_UPDATE_KIND;
-        TestUtils.send(INDEXER_URL, "index", "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), "", kindParam);
+            //new record should be searchable with modified query
+            assertEquals(1, searchUntilFound(getSearchQueryRequestBodyQueryWithLastName(SCHEMA_UPDATE_KIND, "doe")));
+        } finally {
+            //clean up index
+            String kindParam = "?kind="+SCHEMA_UPDATE_KIND;
+            TestUtils.send(INDEXER_URL, "index", "DELETE", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), "", kindParam);
+        }
     }
 
+    /***
+     * Poll Search until the query returns a hit or the indexing deadline passes, and return the last totalCount.
+     */
+    protected static int searchUntilFound(String queryBody) throws Exception {
+        long deadline = System.currentTimeMillis() + INDEXING_TIMEOUT_MILLIS;
+        int totalCount = 0;
+        while (true) {
+            ClientResponse response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), queryBody, "");
+            if (response.getStatus() == 200) {
+                JsonObject jsonObject = JsonParser.parseString(response.getEntity(String.class)).getAsJsonObject();
+                totalCount = jsonObject.get("totalCount").getAsInt();
+                if (totalCount > 0) {
+                    return totalCount;
+                }
+            }
+            if (System.currentTimeMillis() >= deadline) {
+                return totalCount;
+            }
+            Thread.sleep(POLL_INTERVAL_MILLIS);
+        }
+    }
 
     protected static String createJsonBody(String id, String name) {
         return "[" + singleEntityBody(id, name, "", KIND, LEGAL_TAG) + "]";

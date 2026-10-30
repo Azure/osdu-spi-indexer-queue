@@ -84,17 +84,17 @@ The service authenticates to Azure with workload identity, which injects `AZURE_
 | Suite | Where | Runs in CI | Run it yourself |
 |---|---|---|---|
 | Unit | `indexer-queue-azure-enqueue`, `indexer-queue-azure-requeue` | Pull requests (Java Build) | `mvn ... install` from [Build](#build) |
-| Integration | `testing/indexer-queue-azure-enqueue` | No | See below |
+| Acceptance | `testing/indexer-queue-azure-enqueue` | Pull requests (Deploy and Test) | `spi test indexer-queue` |
 
 CI runs these on pull requests from this repository that change code. Documentation-only changes skip the build, and pull requests from forks build without deploying.
 
-There is no acceptance module upstream. The Indexer's suites exercise this service end to end: the records they write through Storage reach the index only through this service. Against an environment you are connected to:
+There is no acceptance module upstream, so `.spi/service.yaml` declares the Azure integration suite carried in `testing/` as this service's acceptance suite. It writes records through Storage, changes a schema, and polls Search until the records show up. The schema test only passes when schema-changed events reach the Indexer through this service. Against an environment you are connected to:
 
 ```bash
-spi test indexer
+spi test indexer-queue
 ```
 
-**Integration** is the Azure suite carried from upstream. It writes records through Storage, changes a schema, and checks that Search returns the results. It sits outside the root Maven build and CI does not run it. It signs in as a service principal with a client secret (`INTEGRATION_TESTER`, `TESTER_SERVICEPRINCIPAL_SECRET`) and accepts no bearer token, so `spi token` cannot drive it, and it has not been proven against SPI Stack.
+The suite takes a bearer token from `INTEGRATION_TESTER_ACCESS_TOKEN`, which CI and `spi test` supply. Without one it falls back to signing in as a service principal (`INTEGRATION_TESTER`, `TESTER_SERVICEPRINCIPAL_SECRET`). The Indexer's suites also exercise this service end to end, since the records they write through Storage reach the index only through it.
 
 ## Deploy
 

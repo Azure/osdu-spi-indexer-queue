@@ -47,7 +47,7 @@
     <okio.version>3.6.0</okio.version>
     <okhttp.version>4.12.1</okhttp.version>
      <!-- Plugin Versions -->
-    <jacoco.version>0.8.11</jacoco.version>
+    <jacoco.version>0.8.14</jacoco.version>
   </properties>
 
   <dependencyManagement>

@@ -35,7 +35,7 @@ Indexer Queue moves record and schema change events from Service Bus to the Inde
 
 ## Build
 
-Requires Java 25 and Maven 3.6.3+. OSDU dependencies resolve from the public community registry through the settings file in `.mvn`. The root pom lists no modules by default, so the `azure` profile is required:
+Requires Java 25 and Maven 3.9.16, the version CI pins; older Maven defaults to a compiler plugin that cannot target Java 25. OSDU dependencies resolve from the public community registry through the settings file in `.mvn`. The root pom lists no modules by default, so the `azure` profile is required:
 
 ```bash
 mvn --settings .mvn/community-maven.settings.xml -P azure clean install

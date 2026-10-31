@@ -44,6 +44,7 @@ public class PubsubEndpointIntegrationTest {
             + System.currentTimeMillis();
     protected static final String entityType = "kind"+System.currentTimeMillis();
     protected static final String SCHEMA_UPDATE_KIND = "osdu:kindupdate:"+entityType+":1.0.0";
+    protected static final String SCHEMA_UPDATE_RECORD_ID = TenantUtils.getTenantName() + ":kindupdate:" + System.currentTimeMillis();
     protected static String LEGAL_TAG = LegalTagUtils.createRandomName();
     protected static final String STORAGE_URL = System.getProperty("STORAGE_URL", System.getenv("STORAGE_URL"));
     protected static final String SEARCH_URL = System.getProperty("SEARCH_URL", System.getenv("SEARCH_URL"));
@@ -52,7 +53,7 @@ public class PubsubEndpointIntegrationTest {
 
     protected static final long INDEXING_TIMEOUT_MILLIS = 120_000;
     protected static final long POLL_INTERVAL_MILLIS = 5_000;
-    protected static final long SCHEMA_EVENT_SETTLE_MILLIS = 15_000;
+    protected static final long SCHEMA_REWRITE_INTERVAL_MILLIS = 30_000;
 
     protected static ObjectMapper mapper = new ObjectMapper();
     protected static Gson gson = new Gson();
@@ -113,18 +114,18 @@ public class PubsubEndpointIntegrationTest {
             String modifySchemaPayalod = getUpdatedSchemaPayload();
             TestUtils.send(SCHEMA_URL, "schema", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), modifySchemaPayalod, "");
 
-            // The schema-changed event travels schema -> Service Bus -> indexer-queue -> indexer, and the
-            // index mapping is not dynamic: a record indexed before the mapping gains lastname is never
-            // searchable by it. Give the event time to land before writing the record.
-            Thread.sleep(SCHEMA_EVENT_SETTLE_MILLIS);
-
-            //create a new record via Storage service using modified kind
-            jsonInput = createJsonBodyWithKind(SCHEMA_UPDATE_KIND, "john", "doe");
-            storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
-            assertEquals(201, storageServiceResponse.getStatus());
-
-            //new record should be searchable with modified query
-            assertEquals(1, searchUntilFound(getSearchQueryRequestBodyQueryWithLastName(SCHEMA_UPDATE_KIND, "doe")));
+            // The index mapping is not dynamic: a version indexed before the schema-changed event reaches the
+            // indexer is never searchable by lastname, so rewrite the record until one is.
+            jsonInput = "[" + singleEntityBody(SCHEMA_UPDATE_RECORD_ID, "john", "doe", SCHEMA_UPDATE_KIND, LEGAL_TAG) + "]";
+            String lastNameQuery = getSearchQueryRequestBodyQueryWithLastName(SCHEMA_UPDATE_KIND, "doe");
+            long deadline = System.currentTimeMillis() + INDEXING_TIMEOUT_MILLIS;
+            int totalCount = 0;
+            while (totalCount == 0 && System.currentTimeMillis() < deadline) {
+                storageServiceResponse = TestUtils.send(STORAGE_URL, "records", "PUT", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), jsonInput, "");
+                assertEquals(201, storageServiceResponse.getStatus());
+                totalCount = searchUntilFound(lastNameQuery, SCHEMA_REWRITE_INTERVAL_MILLIS);
+            }
+            assertEquals(1, totalCount);
         } finally {
             //clean up index
             String kindParam = "?kind="+SCHEMA_UPDATE_KIND;
@@ -133,19 +134,27 @@ public class PubsubEndpointIntegrationTest {
     }
 
     /***
-     * Poll Search until the query returns a hit or the indexing deadline passes, and return the last totalCount.
+     * Poll Search until the query returns a hit or the timeout passes, and return the last totalCount.
      */
     protected static int searchUntilFound(String queryBody) throws Exception {
-        long deadline = System.currentTimeMillis() + INDEXING_TIMEOUT_MILLIS;
+        return searchUntilFound(queryBody, INDEXING_TIMEOUT_MILLIS);
+    }
+
+    protected static int searchUntilFound(String queryBody, long timeoutMillis) throws Exception {
+        long deadline = System.currentTimeMillis() + timeoutMillis;
         int totalCount = 0;
         while (true) {
             ClientResponse response = TestUtils.send(SEARCH_URL, "query", "POST", HeaderUtils.getHeaders(TenantUtils.getTenantName(), TestUtils.getToken()), queryBody, "");
-            if (response.getStatus() == 200) {
-                JsonObject jsonObject = JsonParser.parseString(response.getEntity(String.class)).getAsJsonObject();
-                totalCount = jsonObject.get("totalCount").getAsInt();
-                if (totalCount > 0) {
-                    return totalCount;
+            try {
+                if (response.getStatus() == 200) {
+                    JsonObject jsonObject = JsonParser.parseString(response.getEntity(String.class)).getAsJsonObject();
+                    totalCount = jsonObject.get("totalCount").getAsInt();
+                    if (totalCount > 0) {
+                        return totalCount;
+                    }
                 }
+            } finally {
+                response.close();
             }
             if (System.currentTimeMillis() >= deadline) {
                 return totalCount;

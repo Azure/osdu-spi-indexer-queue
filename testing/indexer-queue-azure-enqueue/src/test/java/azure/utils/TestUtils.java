@@ -62,6 +62,9 @@ public class TestUtils {
 
     public static synchronized String getToken() throws Exception {
         if (Strings.isNullOrEmpty(token)) {
+            token = System.getProperty("INTEGRATION_TESTER_ACCESS_TOKEN", System.getenv("INTEGRATION_TESTER_ACCESS_TOKEN"));
+        }
+        if (Strings.isNullOrEmpty(token)) {
             String sp_id = System.getProperty("INTEGRATION_TESTER", System.getenv("INTEGRATION_TESTER"));
             String sp_secret = System.getProperty("TESTER_SERVICEPRINCIPAL_SECRET", System.getenv("TESTER_SERVICEPRINCIPAL_SECRET"));
             String tenant_id = System.getProperty("AZURE_AD_TENANT_ID", System.getenv("AZURE_AD_TENANT_ID"));

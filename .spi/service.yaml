@@ -2,4 +2,22 @@ schemaVersion: 3
 service:
   name: indexer-queue
   archetype: java-maven-azure
-tests: {}
+tests:
+  # Upstream ships no indexer-queue acceptance module, so the fork-owned end-to-end suite fills
+  # the required acceptance slot: a record written to storage must reach search through
+  # indexer-queue and indexer, before and after a schema change.
+  acceptance:
+    type: maven
+    path: testing
+    mavenArguments: [test]
+    timeoutMinutes: 20
+    bindings:
+      STORAGE_URL: { source: gateway, suffix: /api/storage/v2/ }
+      SEARCH_URL: { source: gateway, suffix: /api/search/v2/ }
+      SCHEMA_URL: { source: gateway, suffix: /api/schema-service/v1/ }
+      INDEXER_URL: { source: gateway, suffix: /api/indexer/v2/ }
+      LEGAL_URL: { source: gateway, suffix: /api/legal/v1/ }
+      TENANT_NAME: { source: partition }
+      DOMAIN: { source: domain }
+      DEPLOY_ENV: { source: static, value: empty }
+      INTEGRATION_TESTER_ACCESS_TOKEN: { source: token }

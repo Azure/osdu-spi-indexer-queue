@@ -42,7 +42,7 @@
     <!-- Test Dependency Versions -->
     <powermock.version>2.0.9</powermock.version>
     <netty.version>4.2.17.Final</netty.version>
-    <opentelemetry.version>1.62.0</opentelemetry.version>
+    <opentelemetry.version>1.67.0</opentelemetry.version>
     <async-http-client.version>2.16.1</async-http-client.version>
     <okio.version>3.6.0</okio.version>
     <okhttp.version>4.12.1</okhttp.version>

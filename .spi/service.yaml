@@ -2,6 +2,10 @@ schemaVersion: 3
 service:
   name: indexer-queue
   archetype: java-maven-azure
+componentGovernance:
+  upstream: https://community.opengroup.org/osdu/platform/system/indexer-queue
+  module: indexer-queue-azure-enqueue
+  profiles: [azure]
 tests:
   # Upstream ships no indexer-queue acceptance module, so the fork-owned end-to-end suite fills
   # the required acceptance slot: a record written to storage must reach search through

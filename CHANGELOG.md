@@ -1,5 +1,62 @@
 # Changelog
 
+## [1.5.0](https://github.com/Azure/osdu-spi-indexer-queue/compare/v1.4.0...v1.5.0) (2026-11-07)
+
+
+### ✨ Features
+
+* Build on Java 25 ([a327575](https://github.com/Azure/osdu-spi-indexer-queue/commit/a3275757d5130d189b5dc6b5a5af1687f4199cb3))
+* Build on Java 25 and run the suite in Deploy and Test ([6929d4a](https://github.com/Azure/osdu-spi-indexer-queue/commit/6929d4a8b951ac4f806cc18830d86f8d6c03be97))
+
+
+### 🔧 Miscellaneous
+
+* Sync template updates ([eb1d8a7](https://github.com/Azure/osdu-spi-indexer-queue/commit/eb1d8a748c804c5542967c4f3ae80ac01427b39a))
+* Sync template updates ([6f81702](https://github.com/Azure/osdu-spi-indexer-queue/commit/6f81702d96b1c71eaa728bda4078c0b6f75e0767))
+* Sync template updates ([51dde45](https://github.com/Azure/osdu-spi-indexer-queue/commit/51dde454ede4096dd0d0a3b64c94b9c5cab95dfc))
+* Sync template updates ([8f13d14](https://github.com/Azure/osdu-spi-indexer-queue/commit/8f13d1493dd7f9f4ad41c98d2ddf1fa3dbc991e8))
+* Sync template updates ([fd96ced](https://github.com/Azure/osdu-spi-indexer-queue/commit/fd96ced3e02ca148704c8a742ea5e9f868b0ad87))
+* Sync template updates ([ad8a189](https://github.com/Azure/osdu-spi-indexer-queue/commit/ad8a189a804c3abf9e4af602a596458fef80f77e))
+* Sync template updates ([7f838ff](https://github.com/Azure/osdu-spi-indexer-queue/commit/7f838ff6e826a90576c821c0f7ad67e747dd9391))
+* Sync template updates ([4f044e6](https://github.com/Azure/osdu-spi-indexer-queue/commit/4f044e62c88376483d92871193e9f09f79f6713b))
+* Sync template updates ([5883c22](https://github.com/Azure/osdu-spi-indexer-queue/commit/5883c22013ca45f376deccd5d1617867e9a4d5e2))
+* Sync template updates ([542ecda](https://github.com/Azure/osdu-spi-indexer-queue/commit/542ecdaec6800cdaa12b7448ca59d57a8381bfbd))
+* **template-sync:** Sync template updates (updated 2026-10-22) ([06e9e35](https://github.com/Azure/osdu-spi-indexer-queue/commit/06e9e35b115ba117d1ee15715d6725179451322a))
+* **template-sync:** Sync template updates (updated 2026-10-27) ([3919216](https://github.com/Azure/osdu-spi-indexer-queue/commit/3919216f97ea0c026bc80cc2748f369195ec4814))
+* **template-sync:** Sync template updates (updated 2026-11-02) ([4850f8f](https://github.com/Azure/osdu-spi-indexer-queue/commit/4850f8fed4c5f29a8915dc254a4f69faf5344563))
+* **template-sync:** Sync template updates (updated 2026-11-04) ([38eba33](https://github.com/Azure/osdu-spi-indexer-queue/commit/38eba33ee6f02371e62eb6df988fb1024de540c2))
+* **template-sync:** Sync template updates 2026-10-27 ([dfc2ce9](https://github.com/Azure/osdu-spi-indexer-queue/commit/dfc2ce9efec5c06b79601b97dccb28eb10baa0d6))
+* **template-sync:** Sync template updates 2026-10-30 ([58e0995](https://github.com/Azure/osdu-spi-indexer-queue/commit/58e0995a56414f56e3d9a45bb0697d99fea9d15e))
+* **template-sync:** Sync template updates 2026-11-02 ([9bd71bb](https://github.com/Azure/osdu-spi-indexer-queue/commit/9bd71bb2fb80eefddfe2661285f13b172f24e8df))
+* **template-sync:** Sync template updates 2026-11-03 ([7002cd0](https://github.com/Azure/osdu-spi-indexer-queue/commit/7002cd08e109229a768ddb7977d198c1e79ba5a2))
+* **template-sync:** Sync template updates 2026-11-05 ([e1523ca](https://github.com/Azure/osdu-spi-indexer-queue/commit/e1523ca8063dc6d68f4ea9a8e7f867e1fc1e5686))
+* **template-sync:** Sync template updates 2026-11-06 ([54543dc](https://github.com/Azure/osdu-spi-indexer-queue/commit/54543dc797127de007797b5e7dd5ee9a404a4c9e))
+
+
+### 🧪 Tests
+
+* **azure:** Rewrite record until schema change is searchable ([9840ede](https://github.com/Azure/osdu-spi-indexer-queue/commit/9840ede0ec7dda0fad256597cced2fd331a3180f))
+
+
+### 🔨 Build System
+
+* **deps-dev:** Bump org.junit.jupiter:junit-jupiter-api ([2de0f9d](https://github.com/Azure/osdu-spi-indexer-queue/commit/2de0f9d0593087bbd703f0c15a14c4fde67bfdf8))
+* **deps-dev:** Bump org.junit.jupiter:junit-jupiter-api from 5.6.2 to 5.6.3 in /testing/indexer-queue-azure-enqueue ([d19af55](https://github.com/Azure/osdu-spi-indexer-queue/commit/d19af55b0d821f0c3ffca98862bb32c0daf456bf))
+* **deps:** Bump com.azure:azure-core-http-netty ([f2e7884](https://github.com/Azure/osdu-spi-indexer-queue/commit/f2e7884d7162cc1499f57ab41ae1fb9fefaff8c6))
+* **deps:** Bump com.azure:azure-core-http-netty from 1.6.2 to 1.6.3 in /testing/indexer-queue-azure-enqueue ([27cd8b0](https://github.com/Azure/osdu-spi-indexer-queue/commit/27cd8b0708008a9f2d3dade61b43c6cd75a5221b))
+* **deps:** Bump com.fasterxml.jackson.core:jackson-databind ([22c4781](https://github.com/Azure/osdu-spi-indexer-queue/commit/22c478136dcdc87873da6d3ff743ddafdf9d85a1))
+* **deps:** Bump com.fasterxml.jackson.core:jackson-databind from 2.13.2.2 to 2.13.5 in /testing/indexer-queue-azure-enqueue ([5c4a85d](https://github.com/Azure/osdu-spi-indexer-queue/commit/5c4a85dd838bedd00737e7d6ea8e153eed68b28f))
+* **deps:** Bump com.squareup.okhttp3:okhttp-bom ([4f7c7d7](https://github.com/Azure/osdu-spi-indexer-queue/commit/4f7c7d740d44337518971d90a13ad541fa4abc0a))
+* **deps:** Bump com.squareup.okhttp3:okhttp-bom from 4.12.0 to 4.12.1 in /indexer-queue-azure-enqueue ([f5fc27a](https://github.com/Azure/osdu-spi-indexer-queue/commit/f5fc27aa50677f24c69ea826a2a6c0a490c3719a))
+* **deps:** Bump opentelemetry, log4j-api, and jackson versions ([0d16146](https://github.com/Azure/osdu-spi-indexer-queue/commit/0d16146915cd87c3478e2ec1644f2c8799ac0d32))
+* **deps:** Consolidate dependabot bumps for opentelemetry, log4j-api, and jackson ([102d2ef](https://github.com/Azure/osdu-spi-indexer-queue/commit/102d2efa4cff08919d17db8d9fc8c6d07946d97e))
+* **deps:** Manage log4j versions through log4j-bom ([1351029](https://github.com/Azure/osdu-spi-indexer-queue/commit/1351029d8b9e107cd6ca06b1b2bcf349728a0d93))
+
+
+### ⚙️ Continuous Integration
+
+* Run the indexer-queue suite in Deploy and Test ([21fdc84](https://github.com/Azure/osdu-spi-indexer-queue/commit/21fdc8460f135be29e250572091825868941732b))
+
 ## [1.4.0](https://github.com/Azure/osdu-spi-indexer-queue/compare/v1.3.0...v1.4.0) (2026-10-14)
 
 

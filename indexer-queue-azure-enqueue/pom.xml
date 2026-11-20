@@ -32,83 +32,29 @@
   </parent>
 
   <properties>
-    <!-- Core Dependencies -->
-    <core-lib-azure.version>3.0.4</core-lib-azure.version>
-    <!-- Project Versions -->
-    <azure-ad-starter.version>3.0.0</azure-ad-starter.version>
-    <msal4j.version>1.17.3</msal4j.version>
+    <core-lib-azure.version>5.0.0</core-lib-azure.version>
     <gson.version>2.11.0</gson.version>
-    <nimbus-jose.version>9.37.4</nimbus-jose.version>
-    <!-- Test Dependency Versions -->
+    <spring-retry.version>2.0.13</spring-retry.version>
+    <lettuce.version>7.9.0.RELEASE</lettuce.version>
     <powermock.version>2.0.9</powermock.version>
-    <netty.version>4.2.17.Final</netty.version>
-    <opentelemetry.version>1.67.0</opentelemetry.version>
-    <async-http-client.version>2.16.1</async-http-client.version>
-    <okio.version>3.6.0</okio.version>
-    <okhttp.version>4.12.1</okhttp.version>
-     <!-- Plugin Versions -->
     <jacoco.version>0.8.14</jacoco.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
-        <artifactId>jackson-bom</artifactId>
-        <version>${jackson.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-bom</artifactId>
-        <version>${netty.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>okhttp-bom</artifactId>
-        <version>${okhttp.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+      <!-- core-lib-azure-bom manages no Spring Boot artifacts; the framework line comes from the root. -->
       <dependency>
         <groupId>org.opengroup.osdu</groupId>
-        <artifactId>core-lib-azure</artifactId>
+        <artifactId>core-lib-azure-bom</artifactId>
         <version>${core-lib-azure.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- Spring Boot manages lettuce 6.8; stay on the 7.x line the other services run (CVE-2025-58057). -->
       <dependency>
-        <groupId>com.nimbusds</groupId>
-        <artifactId>nimbus-jose-jwt</artifactId>
-        <version>${nimbus-jose.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.opentelemetry</groupId>
-        <artifactId>opentelemetry-api</artifactId>
-        <version>${opentelemetry.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.opentelemetry</groupId>
-        <artifactId>opentelemetry-context</artifactId>
-        <version>${opentelemetry.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.asynchttpclient</groupId>
-        <artifactId>async-http-client</artifactId>
-        <version>${async-http-client.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.asynchttpclient</groupId>
-        <artifactId>async-http-client-netty-utils</artifactId>
-        <version>${async-http-client.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.okio</groupId>
-        <artifactId>okio</artifactId>
-        <version>${okio.version}</version>
+        <groupId>io.lettuce</groupId>
+        <artifactId>lettuce-core</artifactId>
+        <version>${lettuce.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -118,13 +64,6 @@
     <dependency>
       <groupId>org.opengroup.osdu</groupId>
       <artifactId>core-lib-azure</artifactId>
-      <version>${core-lib-azure.version}</version>
-        <exclusions>
-            <exclusion>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-            </exclusion>
-        </exclusions>
     </dependency>
 
     <!-- Spring Dependencies -->
@@ -153,13 +92,7 @@
     <dependency>
       <groupId>org.springframework.retry</groupId>
       <artifactId>spring-retry</artifactId>
-    </dependency>
-
-    <!-- Azure Dependencies -->
-    <dependency>
-      <groupId>com.microsoft.azure</groupId>
-      <artifactId>azure-active-directory-spring-boot-starter</artifactId>
-      <version>${azure-ad-starter.version}</version>
+      <version>${spring-retry.version}</version>
     </dependency>
 
     <!-- Test Dependencies -->
@@ -208,13 +141,6 @@
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
         <version>${gson.version}</version>
-    </dependency>
-
-    <!-- Add MSAL4J dependency -->
-    <dependency>
-        <groupId>com.microsoft.azure</groupId>
-        <artifactId>msal4j</artifactId>
-        <version>${msal4j.version}</version>
     </dependency>
   </dependencies>
 

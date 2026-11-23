@@ -30,7 +30,7 @@
         <tomcat.version>11.0.27</tomcat.version>
         <spring-boot.version>4.0.9</spring-boot.version>
         <spring-security.version>7.0.7</spring-security.version>
-        <spring-framework.version>7.0.10</spring-framework.version>
+        <spring-framework.version>7.0.11</spring-framework.version>
         <guava.version>32.1.2-jre</guava.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <os-core-common.version>10.0.1</os-core-common.version>

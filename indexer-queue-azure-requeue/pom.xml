@@ -43,7 +43,7 @@
         <azure.functions.topicname />
         <azure.functions.subscriptionname />
         <azure.functions.indexerqueuekey />
-        <logback.version>1.6.5</logback.version>
+        <logback.version>1.6.8</logback.version>
     </properties>
 
     <pluginRepositories>

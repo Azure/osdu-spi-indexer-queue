@@ -26,7 +26,7 @@
         <json-smart.version>2.6.0</json-smart.version>
         <jackson.version>2.21.8</jackson.version>
         <jackson3.version>3.1.8</jackson3.version>
-        <netty.version>4.2.19.Final</netty.version>
+        <netty.version>4.2.21.Final</netty.version>
         <tomcat.version>11.0.27</tomcat.version>
         <spring-boot.version>4.0.9</spring-boot.version>
         <spring-security.version>7.0.7</spring-security.version>
